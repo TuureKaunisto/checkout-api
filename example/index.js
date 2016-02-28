@@ -7,9 +7,9 @@ var express = require('express');
 
 var app = express();
 var checkout = new CheckoutApi({
-	merchantId:     process.env.MERCHANT_ID,
-	merchantSecret: process.env.MERCHANT_SECRET,
-	baseUrl:        process.env.BASE_URL
+  merchantId:     process.env.MERCHANT_ID,
+  merchantSecret: process.env.MERCHANT_SECRET,
+  baseUrl:        process.env.BASE_URL
 });
 
 // front page
@@ -19,37 +19,37 @@ app.get('/', function (req, res) {
 
 // payment page
 app.post('/buy-shoe', function (req, res) {
-	var html = '<h1>Select payment method</h1>';
+  var html = '<h1>Select payment method</h1>';
 
   checkout.preparePayment({
-  	AMOUNT: 1000,
-  	STAMP: Math.round(Math.random()*100000), // this is just to keep the example simple
-  	// you actually need to generate a unique stamp and store it in the database
-  	REFERENCE: '12345'
+    AMOUNT: 1000,
+    STAMP: Math.round(Math.random()*100000), // this is just to keep the example simple
+    // you actually need to generate a unique stamp and store it in the database
+    REFERENCE: '12345'
   }).then(resp => {
-  	var banks = resp.trade.payments.payment.banks;
+    var banks = resp.trade.payments.payment.banks;
 
     // render html from the response
-  	for (var bankName in banks) {
-  		var hiddenFields = '';
-  		var bank = banks[bankName];
+    for (var bankName in banks) {
+      var hiddenFields = '';
+      var bank = banks[bankName];
 
-  		for (var key in bank) {
-  			var value = bank[key];
-  			if (value === {}) {
-  				value = '';
-  			}
-  			hiddenFields += `<input type="hidden" name="${ key }" value="${ value }" />`;
-  		}
+      for (var key in bank) {
+        var value = bank[key];
+        if (value === {}) {
+          value = '';
+        }
+        hiddenFields += `<input type="hidden" name="${ key }" value="${ value }" />`;
+      }
 
-  		html += `<form action="${bank.url}" method="post">
-  					${ hiddenFields }
-  					<input type="image" src="${ bank.icon }" />
-  					<span>${ bank.name }</span>
-  				</form>`;
-  	}
+      html += `<form action="${bank.url}" method="post">
+            ${ hiddenFields }
+            <input type="image" src="${ bank.icon }" />
+            <span>${ bank.name }</span>
+          </form>`;
+    }
 
-  	res.send(html);
+    res.send(html);
   });
 });
 
