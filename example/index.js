@@ -6,7 +6,7 @@ var CheckoutApi = require('checkout-api');
 var express = require('express');
 
 var app = express();
-var payments = new CheckoutApi({
+var checkout = new CheckoutApi({
 	merchantId:     process.env.MERCHANT_ID,
 	merchantSecret: process.env.MERCHANT_SECRET,
 	baseUrl:        process.env.BASE_URL
@@ -21,7 +21,7 @@ app.get('/', function (req, res) {
 app.post('/buy-shoe', function (req, res) {
 	var html = '<h1>Select payment method</h1>';
 
-  payments.preparePayment({
+  checkout.preparePayment({
   	AMOUNT: 1000,
   	STAMP: Math.round(Math.random()*100000), // this is just to keep the example simple
   	// you actually need to generate a unique stamp and store it in the database
@@ -57,7 +57,7 @@ app.post('/buy-shoe', function (req, res) {
 app.get('/payment-return', function (req, res) {
   // validate the MAC and check that the status indicates the payment has been paid (2,5,6,7,8,9 or 10)
   var status = parseInt(req.query.STATUS);
-  if (payments.validateReturnMsg(req.query) && (status === 2 || status >= 5)) {
+  if (checkout.validateReturnMsg(req.query) && (status === 2 || status >= 5)) {
     res.send('Thanks for your purchase!');
   } else {
     res.send('Unfortunately something went wrong.');
@@ -67,7 +67,7 @@ app.get('/payment-return', function (req, res) {
 // cancel page
 app.get('/payment-cancel', function (req, res) {
   // validate the MAC
-  if (payments.validateReturnMsg(req.query)) {
+  if (checkout.validateReturnMsg(req.query)) {
     res.send('Your payment has been cancelled.');
   } else {
     res.send('Unfortunately something went wrong.');
