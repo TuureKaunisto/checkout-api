@@ -43,9 +43,11 @@ checkout.validateReturnMsg(req.query);
 `preparePayment(data, options)`
 
 ### Data
+
 You can use all options listed in the checkout.fi [documentation](http://www.checkout.fi/materiaalit/tekninen-materiaali/)
 
 ### Options
+
 Key | Allowed values | Default | Description
 --- | --- | --- | ---
 responseType | xml, html, json | json | What kind of data will the output be
@@ -68,3 +70,14 @@ var checkout = new CheckoutApi({
   sendRequest:    (url, data) => new Promise(resolve => resolve('Mock response'))
 });
 ```
+
+## Example
+
+You can take a look at a minimal example in the [example folder](https://github.com/TuureKaunisto/checkout-api/tree/master/test). It is meant only for displaying the basic functionalities of this library. A real app would not be structured like this.
+
+You can run the example by typing (in the example folder):
+```bash
+npm install
+node index.js
+```
+and opening http://localhost:3000 in your browser
