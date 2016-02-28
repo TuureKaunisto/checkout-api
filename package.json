@@ -17,6 +17,10 @@
   "scripts": {
     "test": "mocha"
   },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/TuureKaunisto/checkout-api"
+  },
   "author": "Tuure Kaunisto",
   "license": "ISC"
 }
