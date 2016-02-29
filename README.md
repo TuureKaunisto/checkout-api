@@ -38,6 +38,12 @@ When the payment has been made the user returns and you can validate the payment
 checkout.validateReturnMsg(req.query);
 ```
 
+After the payment has been initialized (`preparePayment()`), you can poll its status by calling `pollPayment(data, options)`
+
+```javascript
+checkout.pollPayment(data, { responseType: 'xml' });
+```
+
 ## preparePayment data and options
 
 `preparePayment(data, options)`
@@ -52,6 +58,20 @@ Key | Allowed values | Default | Description
 --- | --- | --- | ---
 responseType | xml, html, json | json | What kind of data will the output be
 allowSmallPurchases | false, true | false | Allow less than 1€ payments
+
+## pollPayment data and options
+
+`pollPayment(data, options)`
+
+### Data
+
+You can use all options listed in the checkout.fi [documentation](http://www.checkout.fi/materiaalit/tekninen-materiaali/)
+
+### Options
+
+Key | Allowed values | Default | Description
+--- | --- | --- | ---
+responseType | xml, html, json | json | What kind of data will the output be
 
 ## CheckoutApi options
 
