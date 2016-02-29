@@ -44,9 +44,11 @@ You can poll a payments status by calling `pollPayment(data, options)`. The data
 checkout.pollPayment(data, { responseType: 'xml' }).then(resp => { console.log(resp) });
 ```
 
-## preparePayment data and options
+## preparePayment
 
 `preparePayment(data, options)`
+
+Returns: a promise
 
 ### Data
 
@@ -60,9 +62,20 @@ Key | Allowed values | Default | Description
 responseType | xml, html, json | json | What kind of data will the output be
 allowSmallPurchases | false, true | false | Allow less than 1€ payments
 
-## pollPayment data and options
+## validateReturnMsg
+`validateReturnMsg(data)`
+
+Returns: true / false
+
+### data
+
+A javascript object containing the query variables.
+
+## pollPayment
 
 `pollPayment(data, options)`
+
+Returns: a promise
 
 ### Data
 
