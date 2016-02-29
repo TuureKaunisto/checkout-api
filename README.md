@@ -50,7 +50,8 @@ checkout.pollPayment(data, { responseType: 'xml' });
 
 ### Data
 
-You can use all options listed in the checkout.fi [documentation](http://www.checkout.fi/materiaalit/tekninen-materiaali/)
+You can use all options listed in the checkout.fi [documentation](http://www.checkout.fi/materiaalit/tekninen-materiaali/).
+`AMOUNT`, `STAMP` and `REFERENCE` are required.
 
 ### Options
 
@@ -66,7 +67,7 @@ allowSmallPurchases | false, true | false | Allow less than 1€ payments
 ### Data
 
 You can use all options listed in the checkout.fi [documentation](http://www.checkout.fi/materiaalit/tekninen-materiaali/).
-`STAMP`, `REFERENCE` and `AMOUNT` are required.
+`AMOUNT`, `STAMP` and `REFERENCE` are required.
 
 ### Options
 
