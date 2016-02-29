@@ -41,7 +41,7 @@ checkout.validateReturnMsg(req.query);
 You can poll a payments status by calling `pollPayment(data, options)`. The data parameter must include: `STAMP`, `REFERENCE` and `AMOUNT` and they must be the same as in the payment.
 
 ```javascript
-checkout.pollPayment(data, { responseType: 'xml' });
+checkout.pollPayment(data, { responseType: 'xml' }).then(resp => { console.log(resp) });
 ```
 
 ## preparePayment data and options
@@ -62,7 +62,7 @@ allowSmallPurchases | false, true | false | Allow less than 1€ payments
 
 ## pollPayment data and options
 
-`pollPayment(data, options).then(resp => { console.log(resp) })`
+`pollPayment(data, options)`
 
 ### Data
 
