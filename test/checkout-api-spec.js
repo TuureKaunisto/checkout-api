@@ -130,7 +130,8 @@ describe('CheckoutApi', () => {
       checkout.preparePayment(data).then(resp => {
         checkout.pollPayment(data).then(resp => {
           // make sure we got a status as a response
-          expect(resp.trade.status).to.exists
+          expect(resp.trade).to.exist
+          expect(resp.trade.status).to.exist
           done();
         });
       });
