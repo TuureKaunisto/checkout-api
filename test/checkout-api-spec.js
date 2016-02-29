@@ -11,7 +11,7 @@ describe('CheckoutApi', () => {
     sendRequest:    () => new Promise(resolve => resolve('Test response'))
   });
 
-  var payments = new CheckoutApi({
+  var checkout = new CheckoutApi({
     merchantId:     process.env.MERCHANT_ID,
     merchantSecret: process.env.MERCHANT_SECRET,
     baseUrl:        process.env.BASE_URL
@@ -85,9 +85,7 @@ describe('CheckoutApi', () => {
     });
 
     it('should override default values and get a correct response from checkout.fi', (done) => {
-      payments.preparePayment({ AMOUNT: 150, STAMP: Math.round(Math.random()*100000), REFERENCE: '456', LANGUAGE: 'EN' }).then(resp => {
-        console.log(resp);
-
+      checkout.preparePayment({ AMOUNT: 150, STAMP: Math.round(Math.random()*100000), REFERENCE: '456', LANGUAGE: 'EN' }).then(resp => {
         // make sure the override has worked
         expect(resp.trade.language).to.equal('EN');
         // make sure we get banks buttons in the response
@@ -123,4 +121,20 @@ describe('CheckoutApi', () => {
       })).to.equal(false);
     });
   });
+
+  describe('.pollPayment', () => {
+    it('should get a correct response from checkout.fi', (done) => {
+      var data = { AMOUNT: 150, STAMP: Math.round(Math.random()*100000), REFERENCE: '456' };
+
+      //first lets make the payment that we're going to poll later
+      checkout.preparePayment(data).then(resp => {
+        checkout.pollPayment(data).then(resp => {
+          // make sure we got a status as a response
+          expect(resp.trade.status).to.exists
+          done();
+        });
+      });
+    });
+  });
+
 });
