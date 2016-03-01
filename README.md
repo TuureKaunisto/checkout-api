@@ -80,7 +80,7 @@ Returns: a promise
 ### Data
 
 You can use all options listed in the checkout.fi [documentation](http://www.checkout.fi/materiaalit/tekninen-materiaali/).
-`AMOUNT`, `STAMP` and `REFERENCE` are required.
+`AMOUNT`, `STAMP` and `REFERENCE` are required. Also, if you have overriden the defaults while making the `preparePayment` call, you must make the same overrides here for the checksums to match.
 
 ### Options
 
