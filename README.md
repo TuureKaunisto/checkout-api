@@ -80,7 +80,7 @@ Returns: a promise
 ### Data
 
 You can use all options listed in the checkout.fi [documentation](http://www.checkout.fi/materiaalit/tekninen-materiaali/).
-`AMOUNT`, `STAMP` and `REFERENCE` are required. Also, if you have overriden the defaults while making the `preparePayment` call, you must make the same overrides here for the checksums to match.
+`AMOUNT`, `STAMP` and `REFERENCE` are required. If you have overriden the defaults while making the `preparePayment` call, you must make the same overrides here for the checksums to match.
 
 ### Options
 
@@ -88,7 +88,8 @@ Key | Allowed values | Default | Description
 --- | --- | --- | ---
 responseType | xml, html, json | json | What kind of data will the output be
 
-## CheckoutApi options
+## CheckoutApi constructor
+`new CheckoutApi(options)`
 
 Key | Description
 --- | ---
@@ -96,13 +97,15 @@ merchantId | Your merchant id
 merchantSecret | Your merchant secret
 baseUrl | The base url of your application
 sendRequest | You can use a different method for sending the request than the default Node.js request library. The given function must return a promise. This is usefull for example if you want to use a proxy for static outbound ip or write tests that don't actually send the request.
+defaults | You can define default values for the fields
 
 ```javascript
 var checkout = new CheckoutApi({
   merchantId:     process.env.MERCHANT_ID,
   merchantSecret: process.env.MERCHANT_SECRET,
   baseUrl:        process.env.BASE_URL,
-  sendRequest:    (url, data) => new Promise(resolve => resolve('Mock response'))
+  sendRequest:    (url, data) => new Promise(resolve => resolve('Mock response')),
+  defaults:       { LANGUAGE: 'EN' }
 });
 ```
 
