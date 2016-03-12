@@ -43,6 +43,16 @@ describe('CheckoutApi', () => {
     });
   });
 
+  describe('.processPaymentResponse', () => {
+    it('should unescape &amp; from object', () => {
+      var xml = '<?xml version="1.0"?><data><key>value with &amp;-sign, &quot;, &apos;, &lt;, &gt;</key></data>';
+
+      json = checkout.processPaymentResponse(xml, { responseType: 'json' });
+
+      expect(json.data.key).to.equal('value with &-sign, ", \', <, >');
+    });
+  });
+
   describe('.preparePayment', () => {
     it('should throw an error with too small amounts if allowSmallPurchases is not set', () => {
       // check that this list of invalid values all throw an error
