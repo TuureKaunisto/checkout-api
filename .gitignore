@@ -3,3 +3,4 @@ node_modules
 *.sublime-workspace
 *.sublime-project
 .editorconfig
+example/package-lock.json
