@@ -1,5 +1,8 @@
 # Checkout API
 
+## IMPORTANT NOTICE!
+__This library uses the legacy api. Documentation for the newer version is available [here](https://checkoutfinland.github.io/psp-api/#/).__
+
 This is a simple library for online payments with the Finnish Checkout online bank payment system
 
 ## Installing
@@ -119,3 +122,8 @@ npm install
 node index.js
 ```
 and opening [http://localhost:3000](http://localhost:3000) in your browser
+
+## Running tests
+```
+npm run test
+```
