@@ -1,22 +1,20 @@
 {
   "name": "checkout-api",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "A library for the Finnish Checkout online bank payment system integration",
-  "main": "lib/checkout-api.js",
-  "dependencies": {
-    "md5": "2.0.0",
-    "moment": "^2.24.0",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.4",
-    "xml2json": "^0.11.2"
-  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {},
   "devDependencies": {
-    "chai": "^3.5.0",
-    "dotenv": "^2.0.0",
-    "mocha": "^6.0.0"
+    "@types/node": "^12.0.0",
+    "jest": "^24.7.1",
+    "ts-node-dev": "^1.0.0-pre.35",
+    "typescript": "^3.4.5"
   },
   "scripts": {
-    "test": "mocha"
+    "tsc": "tsc",
+    "dev": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
+    "test": "jest"
   },
   "repository": {
     "type": "git",

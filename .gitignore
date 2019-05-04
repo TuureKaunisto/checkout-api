@@ -1,6 +1,6 @@
 node_modules
 .DS_store
-*.sublime-workspace
-*.sublime-project
-.editorconfig
-example/package-lock.json
+.env
+
+.vscode/*
+!.vscode/settings.json

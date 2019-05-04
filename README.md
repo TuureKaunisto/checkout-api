@@ -116,12 +116,14 @@ var checkout = new CheckoutApi({
 
 You can take a look at a minimal example in the [example folder](https://github.com/TuureKaunisto/checkout-api/tree/master/example). It is meant only for displaying the basic functionalities of this library. A real app would not be structured like this.
 
-You can run the example by typing (in the example folder):
+You can run the example by running the following commands:
 ```bash
+cd example
+cp .env.example .env
 npm install
 node index.js
 ```
-and opening [http://localhost:3000](http://localhost:3000) in your browser
+You can then open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Running tests
 ```
