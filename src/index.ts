@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 import { get, set } from 'lodash';
 
 import { CheckoutHeaders, CheckoutBody } from './interfaces';
+import { MERCHANT_SECRET } from '../test/fixture';
 
 const PREPARE_PAYMENT_URL = 'https://api.checkout.fi/payments';
 
@@ -32,6 +33,9 @@ export class CheckoutApi {
 		// merge given options with defaults
 		const mergedOptions: CheckoutOptions = Object.assign({}, this.options, options);
 
+		const signature = CheckoutApi.calculateHmac(MERCHANT_SECRET, <KeyValue>mergedOptions.headers, <CheckoutBody | undefined>mergedOptions.body);
+		set(mergedOptions, 'headers.signature', signature);
+
 		return fetch(PREPARE_PAYMENT_URL, {
 			method: 'POST',
 			headers: <KeyValue>mergedOptions.headers,
@@ -39,9 +43,9 @@ export class CheckoutApi {
 		});
 	}
 
-	static calculateHmac(secret: string, headers: any, body?: any): string {
+	static calculateHmac(secret: string, headers: KeyValue, body?: CheckoutBody): string {
 		const hmacPayload =
-			Object.keys(headers)
+			Object.keys(headers || {})
 				// keep only checkout- params
 				.filter(key => key.startsWith('checkout-'))
 				.sort()
