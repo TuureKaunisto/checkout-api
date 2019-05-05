@@ -1,4 +1,4 @@
-import { createHmac } from 'crypto';
+import { createHmac, randomBytes } from 'crypto';
 import fetch from 'node-fetch';
 import { get, set } from 'lodash';
 
@@ -15,27 +15,59 @@ interface CheckoutOptions {
 type KeyValue = { [key: string]: string };
 
 export class CheckoutApi {
-	options: CheckoutOptions = {};
+	// define sensible defaults
+	options: CheckoutOptions = {
+		body: {
+			currency: 'EUR',
+			language: 'EN'
+		},
+		headers: {
+			'checkout-algorithm': 'sha256',
+			'content-type': 'application/json; charset=utf-8',
+			'checkout-method': 'POST'
+		}
+	};
 
 	constructor(options?: CheckoutOptions) {
 		if (options) this.setDefaults(options);
 	}
 
 	setDefaults(options: CheckoutOptions) {
-		this.options = options || {};
-		// make sure the content-type header is set
-		if (get(this.options, 'headers.content-type')) {
-			set(this.options, 'headers.content-type', 'application/json; charset=utf-8');
+		this.options = Object.assign(this.options, options);
+	}
+
+	setIfEmpty(obj: object, path: string, value: any) {
+		if (!get(obj, path)) {
+			set(obj, path, value);
 		}
 	}
 
-	preparePayment(options: CheckoutOptions): Promise<any> {
+	mergeOptions(options: CheckoutOptions): CheckoutOptions {
 		// merge given options with defaults
-		const mergedOptions: CheckoutOptions = Object.assign({}, this.options, options);
+		const mergedOptions = {
+			headers: Object.assign({}, this.options.headers, options.headers),
+			body: Object.assign({}, this.options.body, options.body)
+		};
 
+		// create a random nonce if none was given
+		this.setIfEmpty(mergedOptions, 'headers.checkout-nonce', randomBytes(64).toString('hex'));
+		// use current time if no timestamp was given
+		this.setIfEmpty(mergedOptions, 'headers.checkout-timestamp', new Date().toISOString());
+
+		// TODO: validate request (account must be set etc.) perhaps use type guards.
+
+		return mergedOptions;
+	}
+
+	preparePayment(options: CheckoutOptions): Promise<any> {
+		// apply options on top of defaults
+		const mergedOptions = this.mergeOptions(options);
+
+		// calculate HMAC signature and add the signature header
 		const signature = CheckoutApi.calculateHmac(MERCHANT_SECRET, <KeyValue>mergedOptions.headers, <CheckoutBody | undefined>mergedOptions.body);
 		set(mergedOptions, 'headers.signature', signature);
 
+		// make the api call
 		return fetch(PREPARE_PAYMENT_URL, {
 			method: 'POST',
 			headers: <KeyValue>mergedOptions.headers,
