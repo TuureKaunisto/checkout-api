@@ -16,8 +16,8 @@ type KeyValue = { [key: string]: string };
 export class CheckoutApi {
 	options: CheckoutOptions = {};
 
-	constructor(options: CheckoutOptions) {
-		this.setDefaults(options);
+	constructor(options?: CheckoutOptions) {
+		if (options) this.setDefaults(options);
 	}
 
 	setDefaults(options: CheckoutOptions) {
