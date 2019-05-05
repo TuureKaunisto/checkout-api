@@ -10,7 +10,8 @@ export interface CheckoutHeaders {
 	// ISO 8601 date time
 	'checkout-timestamp': string
 	// Checkout transaction ID when accessing single transaction - not required for a new payment request
-	'checkout-transaction-id'?: string
+	'checkout-transaction-id'?: string,
+	'content-type'?: string,
 }
 
 export interface CheckoutBody {
