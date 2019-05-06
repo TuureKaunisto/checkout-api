@@ -1,17 +1,34 @@
 import nock from 'nock';
+import { get } from 'lodash';
 
 import { CheckoutApi } from '../src/index';
 import { basicRequest, MERCHANT_SECRET } from './fixture';
 
-describe('calculateHmac', () => {
-	it('Should calculate the HMAC', () => {
-		const hmac = CheckoutApi.calculateHmac(MERCHANT_SECRET, basicRequest.headers, basicRequest.body);
-		expect(hmac).toBe(basicRequest.hmac);
+describe('setDefaults', () => {
+	it('Should set the default options', () => {
+		const checkout = new CheckoutApi();
+		checkout.setDefaults({ headers: { 'checkout-method': 'GET', 'checkout-nonce': '123' } });
+		expect(checkout.options).toEqual({
+			body: {
+				currency: 'EUR',
+				language: 'EN'
+			},
+			headers: {
+				'checkout-algorithm': 'sha256',
+				'content-type': 'application/json; charset=utf-8',
+				'checkout-method': 'GET',
+				'checkout-nonce': '123'
+			}
+		});
 	});
+});
 
-	it('Should calculate the HMAC without body', () => {
-		const hmac = CheckoutApi.calculateHmac(MERCHANT_SECRET, basicRequest.headers);
-		expect(hmac).toBe(basicRequest.hmacWithoutBody);
+describe('completeOptions', () => {
+	it('Should complete timestamp and nonce', () => {
+		const checkout = new CheckoutApi();
+		const completedOptions = checkout.completeOptions({});
+		expect(get(completedOptions, 'headers.checkout-timestamp')).toBeTruthy();
+		expect(get(completedOptions, 'headers.checkout-nonce')).toBeTruthy();
 	});
 });
 
@@ -83,5 +100,17 @@ describe('preparePayment', () => {
 
 		const result = await checkout.preparePayment({});
 		expect(result.status).toBe(200);
+	});
+});
+
+describe('calculateHmac', () => {
+	it('Should calculate the HMAC', () => {
+		const hmac = CheckoutApi.calculateHmac(MERCHANT_SECRET, basicRequest.headers, basicRequest.body);
+		expect(hmac).toBe(basicRequest.hmac);
+	});
+
+	it('Should calculate the HMAC without body', () => {
+		const hmac = CheckoutApi.calculateHmac(MERCHANT_SECRET, basicRequest.headers);
+		expect(hmac).toBe(basicRequest.hmacWithoutBody);
 	});
 });
