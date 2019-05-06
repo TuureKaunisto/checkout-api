@@ -1,4 +1,4 @@
-export const MERCHANT_ID = 375917;
+export const MERCHANT_ID = '375917';
 export const MERCHANT_SECRET = 'SAIPPUAKAUPPIAS';
 
 export const basicRequest = {
@@ -13,8 +13,8 @@ export const basicRequest = {
 		stamp: 'unique-identifier-for-merchant',
 		reference: '3759170',
 		amount: 1525,
-		currency: 'EUR',
-		language: 'FI',
+		currency: <'EUR'>'EUR',
+		language: <'FI'>'FI',
 		items: [{
 				unitPrice: 1525,
 				units: 1,

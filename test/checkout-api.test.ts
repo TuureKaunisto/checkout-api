@@ -15,6 +15,62 @@ describe('calculateHmac', () => {
 	});
 });
 
+describe('mergeOptions', () => {
+	it('Should merge options with defaults', () => {
+		const checkout = new CheckoutApi({
+			headers: { 'checkout-account': '123' },
+			body: { stamp: '456' }
+		});
+		const mergedOptions = checkout.mergeOptions({
+			headers: { 'checkout-algorithm': 'sha512' },
+			body: { reference: '789' }
+		});
+
+		expect(mergedOptions).toEqual({
+			headers: {
+				'checkout-account': '123',
+				'checkout-algorithm': 'sha512',
+				'content-type': 'application/json; charset=utf-8',
+				'checkout-method': 'POST'
+			},
+			body: {
+				stamp: '456',
+				reference: '789',
+				currency: 'EUR',
+				language: 'EN'
+			}
+		});
+	});
+
+	it('Should override defaults', () => {
+		const checkout = new CheckoutApi({
+			headers: { 'checkout-account': '123' },
+			body: {
+				stamp: '456',
+				language: 'FI',
+			}
+		});
+		const mergedOptions = checkout.mergeOptions({
+			headers: { 'checkout-account': '789' },
+			body: { stamp: 'abc' }
+		});
+
+		expect(mergedOptions).toEqual({
+			headers: {
+				'checkout-account': '789',
+				'checkout-algorithm': 'sha256',
+				'content-type': 'application/json; charset=utf-8',
+				'checkout-method': 'POST'
+			},
+			body: {
+				stamp: 'abc',
+				currency: 'EUR',
+				language: 'FI'
+			},
+		});
+	});
+});
+
 describe('preparePayment', () => {
 	it('Should call the checkout api with a signature', async () => {
 		const checkout = new CheckoutApi();

@@ -33,7 +33,7 @@ export class CheckoutApi {
 	}
 
 	setDefaults(options: CheckoutOptions) {
-		this.options = Object.assign(this.options, options);
+		this.options = this.mergeOptions(options);
 	}
 
 	setIfEmpty(obj: object, path: string, value: any) {
@@ -49,19 +49,25 @@ export class CheckoutApi {
 			body: Object.assign({}, this.options.body, options.body)
 		};
 
-		// create a random nonce if none was given
-		this.setIfEmpty(mergedOptions, 'headers.checkout-nonce', randomBytes(64).toString('hex'));
-		// use current time if no timestamp was given
-		this.setIfEmpty(mergedOptions, 'headers.checkout-timestamp', new Date().toISOString());
-
-		// TODO: validate request (account must be set etc.) perhaps use type guards.
-
 		return mergedOptions;
+	}
+
+	completeOptions(options: CheckoutOptions): CheckoutOptions {
+		// make a shallow copy
+		const completedOptions = Object.assign({}, options);
+		// create a random nonce if none was given
+		this.setIfEmpty(completedOptions, 'headers.checkout-nonce', randomBytes(64).toString('hex'));
+		// use current time if no timestamp was given
+		this.setIfEmpty(completedOptions, 'headers.checkout-timestamp', new Date().toISOString());
+		return completedOptions;
 	}
 
 	preparePayment(options: CheckoutOptions): Promise<any> {
 		// apply options on top of defaults
 		const mergedOptions = this.mergeOptions(options);
+		const completedOptions = this.completeOptions(mergedOptions);
+
+		// TODO: validate request (account must be set etc.) perhaps use type guards.
 
 		// calculate HMAC signature and add the signature header
 		const signature = CheckoutApi.calculateHmac(MERCHANT_SECRET, <KeyValue>mergedOptions.headers, <CheckoutBody | undefined>mergedOptions.body);
