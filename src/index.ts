@@ -54,7 +54,7 @@ export class CheckoutApi {
 		const completedOptions = this.completeOptions(options);
 
 		// TODO: validate request (account must be set etc.) perhaps use type guards.
-		const secret = completedOptions.merchantSecret || 'SAIPPUAKAUPPIAS';
+		const secret = <string>completedOptions.merchantSecret;
 		const headers = CheckoutApi.getHeaders(completedOptions);
 		const body = CheckoutApi.getBody(completedOptions);
 
@@ -68,6 +68,13 @@ export class CheckoutApi {
 			headers: headers,
 			body: JSON.stringify(body),
 		});
+	}
+
+	validateReturnRequest(parameters: KeyValue): boolean {
+		const secret = <string>this.options.merchantSecret;
+		// calculate actual signature of the given parameters
+		const hmacSignature = CheckoutApi.calculateHmac(secret, parameters);
+		return hmacSignature === parameters.signature;
 	}
 
 	static getFullHeaderName(key: string): string | boolean {

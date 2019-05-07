@@ -1,7 +1,7 @@
 import nock from 'nock';
 
 import { CheckoutApi } from '../src/index';
-import { basicRequest, MERCHANT_SECRET } from './fixture';
+import { basicRequest, MERCHANT_ID, MERCHANT_SECRET } from './fixture';
 
 describe('setDefaults', () => {
 	it('Should set the default options', () => {
@@ -68,7 +68,7 @@ describe('completeOptions', () => {
 
 describe('preparePayment', () => {
 	it('Should call the checkout api with a signature', async () => {
-		const checkout = new CheckoutApi();
+		const checkout = new CheckoutApi({ merchantSecret: MERCHANT_SECRET });
 
 		nock('https://api.checkout.fi', {
 			reqheaders: { 'signature': /.+/ }
@@ -79,6 +79,33 @@ describe('preparePayment', () => {
 		const result = await checkout.preparePayment({});
 		// response should be that of a teapot since that's what we mocked
 		expect(result.status).toBe(418);
+	});
+});
+
+describe('validateReturnRequest', () => {
+	const queryParameters = {
+		'checkout-account': '375917',
+		'checkout-algorithm': 'sha256',
+		'checkout-amount': '2964',
+		'checkout-stamp': '15336332710015',
+		'checkout-reference': '192387192837195',
+		'checkout-transaction-id': '4b300af6-9a22-11e8-9184-abb6de7fd2d0',
+		'checkout-status': 'ok',
+		'checkout-provider': 'nordea',
+		'signature': 'b2d3ecdda2c04563a4638fcade3d4e77dfdc58829b429ad2c2cb422d0fc64080'
+	};
+	const checkout = new CheckoutApi({ account: MERCHANT_ID, merchantSecret: MERCHANT_SECRET });
+
+	it('Should return true if a correct signature is given', () => {
+		expect(checkout.validateReturnRequest(queryParameters)).toBe(true);
+	});
+
+	it('Should return false if an incorrect signature is given', () => {
+		// crate a false signature
+		const falseQueryParameters = Object.assign({}, queryParameters);
+		falseQueryParameters.signature += 'a';
+
+		expect(checkout.validateReturnRequest(falseQueryParameters)).toBe(false);
 	});
 });
 
