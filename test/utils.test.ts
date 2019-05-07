@@ -13,3 +13,21 @@ describe('setIfEmpty', () => {
 		expect(obj).toEqual({ foo: 'bar' });
 	});
 });
+
+describe('camelCaseToDashes', () => {
+	it('Should convert camel case to kebab case', () => {
+		expect(Utils.camelCaseToDashes('loremIpsumDolorSitAmet')).toBe('lorem-ipsum-dolor-sit-amet');
+	});
+
+	it('Should not add a dash in front of a leading capital letter', () => {
+		expect(Utils.camelCaseToDashes('FooBarBaz')).toBe('foo-bar-baz');
+	});
+
+	it('Should work with existing dashed', () => {
+		expect(Utils.camelCaseToDashes('Foo-barBaz')).toBe('foo-bar-baz');
+	});
+
+	it('Should not add a dash if there already is one', () => {
+		expect(Utils.camelCaseToDashes('Foo-BarBaz')).toBe('foo-bar-baz');
+	});
+});
