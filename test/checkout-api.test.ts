@@ -82,6 +82,31 @@ describe('preparePayment', () => {
 	});
 });
 
+describe('getFullHeaderName', () => {
+	it('Should get the full name of the header field', () => {
+		expect(CheckoutApi.getFullHeaderName('account')).toBe('checkout-account');
+		expect(CheckoutApi.getFullHeaderName('transactionId')).toBe('checkout-transaction-id');
+	});
+
+	it('Should return false if header is not found', () => {
+		expect(CheckoutApi.getFullHeaderName('lorem-ipsum')).toBe(false);
+	});
+});
+
+describe('getHeaders', () => {
+	it('Should return set of headers', () => {
+		expect(CheckoutApi.getHeaders({ method: 'GET', language: 'FI' }))
+			.toEqual({ 'checkout-method': 'GET' });
+	});
+});
+
+describe('getBody', () => {
+	it('Should return set of body fields', () => {
+		expect(CheckoutApi.getBody({ nonce: 'foobar', amount: 7894 }))
+			.toEqual({ amount: 7894 });
+	});
+});
+
 describe('calculateHmac', () => {
 	it('Should calculate the HMAC', () => {
 		const hmac = CheckoutApi.calculateHmac(MERCHANT_SECRET, basicRequest.headers, basicRequest.body);
