@@ -1,20 +1,22 @@
 export interface CheckoutHeaders {
+	[key:string]: any,
 	// Checkout account ID, eg. 375917
-	'checkout-account': string,
+	account: string,
 	// Used signature algorithm, either sha256 or sha512
-	'checkout-algorithm': 'sha256' | 'sha512',
+	algorithm: 'sha256' | 'sha512',
 	// HTTP verb of the request, either GET or POST
-	'checkout-method': 'GET' | 'POST',
+	method: 'GET' | 'POST',
 	// Unique identifier for this request
-	'checkout-nonce': string,
+	nonce: string,
 	// ISO 8601 date time
-	'checkout-timestamp': string
+	timestamp: string
 	// Checkout transaction ID when accessing single transaction - not required for a new payment request
-	'checkout-transaction-id'?: string,
-	'content-type'?: string,
+	transactionId?: string,
+	contentType?: string,
 }
 
 export interface CheckoutBody {
+	[key:string]: any,
 	// Merchant unique identifier for the order
 	stamp: string,
 	// Order reference
