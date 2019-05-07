@@ -144,4 +144,12 @@ describe('calculateHmac', () => {
 		const hmac = CheckoutApi.calculateHmac(MERCHANT_SECRET, basicRequest.headers);
 		expect(hmac).toBe(basicRequest.hmacWithoutBody);
 	});
+
+	it('Should calculate sha512 HMAC', () => {
+		const headers = Object.assign({}, basicRequest.headers);
+		headers['checkout-algorithm'] = 'sha512';
+
+		const hmac = CheckoutApi.calculateHmac(MERCHANT_SECRET, headers, basicRequest.body);
+		expect(hmac).toBe(basicRequest.hmacWithSha512);
+	});
 });

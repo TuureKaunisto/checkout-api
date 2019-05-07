@@ -1,6 +1,6 @@
 import { createHmac, randomBytes } from 'crypto';
 import fetch, { Response } from 'node-fetch';
-import _, { set, pickBy, mapKeys } from 'lodash';
+import _, { pickBy, get } from 'lodash';
 
 import { Utils } from './utils';
 import { CheckoutHeaders, CheckoutBody } from './interfaces';
@@ -118,7 +118,11 @@ export class CheckoutApi {
 				.concat(body ? JSON.stringify(body) : '')
 				.join("\n");
 
-		return createHmac('sha256', secret)
+		// allow only sha256 or sha512 as the algorithm value. Default to sha256.
+		let algorithm = get(headers, 'checkout-algorithm');
+		if (algorithm !== 'sha512') algorithm = 'sha256';
+
+		return createHmac(algorithm, secret)
 			.update(hmacPayload)
 			.digest('hex');
 	}
