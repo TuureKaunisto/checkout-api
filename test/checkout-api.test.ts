@@ -109,6 +109,22 @@ describe('validateReturnRequest', () => {
 	});
 });
 
+describe('pollPayment', () => {
+	it('Should call the checkout api with a signature', async () => {
+		const checkout = new CheckoutApi({ merchantSecret: MERCHANT_SECRET });
+
+		nock('https://api.checkout.fi', {
+			reqheaders: { 'signature': /.+/ }
+		})
+  			.get('/payments/foo')
+			.reply(418);
+
+		const result = await checkout.pollPayment('foo')
+		// response should be that of a teapot since that's what we mocked
+		expect(result.status).toBe(418);
+	});
+});
+
 describe('getFullHeaderName', () => {
 	it('Should get the full name of the header field', () => {
 		expect(CheckoutApi.getFullHeaderName('account')).toBe('checkout-account');

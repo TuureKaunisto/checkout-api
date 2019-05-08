@@ -6,6 +6,7 @@ import { Utils } from './utils';
 import { CheckoutHeaders, CheckoutBody } from './interfaces';
 
 const PREPARE_PAYMENT_URL = 'https://api.checkout.fi/payments';
+const POLL_PAYMENT_URL = PREPARE_PAYMENT_URL;
 const HEADER_FIELDS = [
 	'checkout-account',
 	'checkout-algorithm',
@@ -39,7 +40,7 @@ export class CheckoutApi {
 		Object.assign(this.options, options);
 	}
 
-	completeOptions(options: CheckoutOptions): CheckoutOptions {
+	completeOptions(options?: CheckoutOptions): CheckoutOptions {
 		// merge into a new shallow copy
 		const completedOptions = Object.assign({}, this.options, options);
 		// create a random nonce if none was given
@@ -63,7 +64,7 @@ export class CheckoutApi {
 		headers['signature'] = signature;
 
 		// make the api call
-		return fetch(PREPARE_PAYMENT_URL, {
+		return fetch(POLL_PAYMENT_URL, {
 			method: 'POST',
 			headers: headers,
 			body: JSON.stringify(body),
@@ -75,6 +76,21 @@ export class CheckoutApi {
 		// calculate actual signature of the given parameters
 		const hmacSignature = CheckoutApi.calculateHmac(secret, parameters);
 		return hmacSignature === parameters.signature;
+	}
+
+	pollPayment(transactionId: string): Promise<Response> {
+		// calculate HMAC signature and add the signature header
+		const completedOptions = this.completeOptions();
+		const secret = <string>completedOptions.merchantSecret;
+		const headers = CheckoutApi.getHeaders(completedOptions);
+		const signature = CheckoutApi.calculateHmac(secret, headers);
+		headers['signature'] = signature;
+
+		// make the api call
+		return fetch(`${POLL_PAYMENT_URL}/${encodeURIComponent(transactionId)}`, {
+			method: 'GET',
+			headers: headers,
+		});
 	}
 
 	static getFullHeaderName(key: string): string | boolean {
