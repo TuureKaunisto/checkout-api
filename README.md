@@ -121,7 +121,7 @@ You can run the example by running the following commands:
 cd example
 cp .env.example .env
 npm install
-node index.js
+npm start
 ```
 You can then open [http://localhost:3000](http://localhost:3000) in your browser.
 
