@@ -34,7 +34,6 @@ describe('completeOptions', () => {
 			account: '123',
 			algorithm: 'sha512',
 			contentType: 'application/json; charset=utf-8',
-			method: 'POST',
 			stamp: '456',
 			reference: '789',
 			currency: 'EUR',
@@ -56,7 +55,6 @@ describe('completeOptions', () => {
 			account: '789',
 			algorithm: 'sha256',
 			contentType: 'application/json; charset=utf-8',
-			method: 'POST',
 			stamp: 'abc',
 			currency: 'EUR',
 			language: 'FI',
@@ -66,9 +64,9 @@ describe('completeOptions', () => {
 	});
 });
 
-describe('preparePayment', () => {
-	it('Should call the checkout api with a signature', async () => {
-		const checkout = new CheckoutApi({ merchantSecret: MERCHANT_SECRET });
+describe('makeSignedRequest', () => {
+	it('Should call the checkout api with a signed POST request', async () => {
+		const checkout = new CheckoutApi({ account: MERCHANT_ID, merchantSecret: MERCHANT_SECRET });
 
 		nock('https://api.checkout.fi', {
 			reqheaders: { 'signature': /.+/ }
@@ -76,8 +74,21 @@ describe('preparePayment', () => {
   			.post('/payments')
 			.reply(418);
 
-		const result = await checkout.preparePayment({});
+		const result = await checkout.makeSignedRequest('https://api.checkout.fi/payments', { method: 'POST' });
 		// response should be that of a teapot since that's what we mocked
+		expect(result.status).toBe(418);
+	});
+});
+
+describe('preparePayment', () => {
+	it('Should make a POST request', async () => {
+		const checkout = new CheckoutApi({ merchantSecret: MERCHANT_SECRET });
+
+		nock('https://api.checkout.fi')
+  			.post('/payments')
+			.reply(418);
+
+		const result = await checkout.preparePayment();
 		expect(result.status).toBe(418);
 	});
 });
@@ -110,17 +121,14 @@ describe('validateReturnRequest', () => {
 });
 
 describe('pollPayment', () => {
-	it('Should call the checkout api with a signature', async () => {
+	it('Should make a get request and add the given transaction id to the path', async () => {
 		const checkout = new CheckoutApi({ merchantSecret: MERCHANT_SECRET });
 
-		nock('https://api.checkout.fi', {
-			reqheaders: { 'signature': /.+/ }
-		})
+		nock('https://api.checkout.fi')
   			.get('/payments/foo')
 			.reply(418);
 
-		const result = await checkout.pollPayment('foo')
-		// response should be that of a teapot since that's what we mocked
+		const result = await checkout.pollPayment('foo');
 		expect(result.status).toBe(418);
 	});
 });

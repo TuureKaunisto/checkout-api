@@ -5,8 +5,7 @@ import _, { pickBy, get } from 'lodash';
 import { Utils } from './utils';
 import { CheckoutHeaders, CheckoutBody } from './interfaces';
 
-const PREPARE_PAYMENT_URL = 'https://api.checkout.fi/payments';
-const POLL_PAYMENT_URL = PREPARE_PAYMENT_URL;
+const CHECKOUT_API_URL = 'https://api.checkout.fi/payments';
 const HEADER_FIELDS = [
 	'checkout-account',
 	'checkout-algorithm',
@@ -28,8 +27,7 @@ export class CheckoutApi {
 		currency: 'EUR',
 		language: 'EN',
 		algorithm: 'sha256',
-		contentType: 'application/json; charset=utf-8',
-		method: 'POST'
+		contentType: 'application/json; charset=utf-8'
 	};
 
 	constructor(options?: CheckoutOptions) {
@@ -50,25 +48,29 @@ export class CheckoutApi {
 		return completedOptions;
 	}
 
-	preparePayment(options: CheckoutOptions): Promise<Response> {
+	makeSignedRequest(url: string, options: CheckoutOptions): Promise<Response> {
 		// apply options on top of defaults and complete smart defaults for undefined mandatory fields
 		const completedOptions = this.completeOptions(options);
-
-		// TODO: validate request (account must be set etc.) perhaps use type guards.
+		const hasBody = completedOptions.method === 'POST';
 		const secret = <string>completedOptions.merchantSecret;
 		const headers = CheckoutApi.getHeaders(completedOptions);
-		const body = CheckoutApi.getBody(completedOptions);
+		const body = hasBody ? CheckoutApi.getBody(completedOptions) : undefined;
 
 		// calculate HMAC signature and add the signature header
-		const signature = CheckoutApi.calculateHmac(secret, headers, <CheckoutBody | undefined>body);
+		const signature = CheckoutApi.calculateHmac(secret, headers, body);
 		headers['signature'] = signature;
 
 		// make the api call
-		return fetch(POLL_PAYMENT_URL, {
-			method: 'POST',
+		return fetch(url, {
+			method: completedOptions.method,
 			headers: headers,
-			body: JSON.stringify(body),
+			body: hasBody ? JSON.stringify(body) : undefined,
 		});
+	}
+
+	preparePayment(options?: CheckoutOptions): Promise<Response> {
+		// TODO: validate request (account must be set etc.) perhaps use type guards.
+		return this.makeSignedRequest(CHECKOUT_API_URL, { ...options, method: 'POST' });
 	}
 
 	validateReturnRequest(parameters: KeyValue): boolean {
@@ -79,18 +81,9 @@ export class CheckoutApi {
 	}
 
 	pollPayment(transactionId: string): Promise<Response> {
-		// calculate HMAC signature and add the signature header
-		const completedOptions = this.completeOptions();
-		const secret = <string>completedOptions.merchantSecret;
-		const headers = CheckoutApi.getHeaders(completedOptions);
-		const signature = CheckoutApi.calculateHmac(secret, headers);
-		headers['signature'] = signature;
-
-		// make the api call
-		return fetch(`${POLL_PAYMENT_URL}/${encodeURIComponent(transactionId)}`, {
-			method: 'GET',
-			headers: headers,
-		});
+		// add transaction id to url
+		const url = `${CHECKOUT_API_URL}/${encodeURIComponent(transactionId)}`;
+		return this.makeSignedRequest(url, { method: 'GET' });
 	}
 
 	static getFullHeaderName(key: string): string | boolean {
